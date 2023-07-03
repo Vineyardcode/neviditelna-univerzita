@@ -77,13 +77,13 @@
             <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">Events:</v-card-title>
             <v-card-text class="pa-4">
               <v-row>
-                <v-col cols="3">
+                <v-col cols="2">
                   <div class="font-weight-bold ma-1 pa-1">Create date:</div>
                   <div class="font-weight-bold ma-1 pa-1">Update date:</div>
                   <div class="font-weight-bold ma-1 pa-1">Transfer date:</div>
                   <div class="font-weight-bold ma-1 pa-1">Delete date:</div>
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="4">
                   <div class="date ma-1 pa-1" color="gray-lighten-2">
                     {{ new Date(domainDetail.events.registered.timestamp).toLocaleString('en-US', options) }}
                   </div>
@@ -97,13 +97,13 @@
                     {{ domainDetail.events.transferred.timestamp }}
                   </div>
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="2">
                   <div class="font-weight-bold ma-1 pa-1">Registrar:</div>
                   <div class="font-weight-bold ma-1 pa-1">Registrar:</div>
                   <div class="font-weight-bold ma-1 pa-1">Registrar:</div>
                   <div v-if="domainDetail.events.unregistered" class="font-weight-bold ma-1 pa-1">Registrar:</div>
                 </v-col>
-                <v-col cols="3">
+                <v-col cols="4">
                   <div class="date ma-1 pa-1" color="info">
                     {{ domainDetail.events.registered.registrar_handle }}
                   </div>
@@ -124,15 +124,37 @@
 
         <!-- STATE FLAGS -->
         <div>
-          <v-card class="ma-4 ">
-            <div class="pa-2 bg-grey-lighten-2 font-weight-bold">State flags:</div>
-            <div class="d-flex">
-              <ul>
-                <li v-for="flag in filteredStateFlags" :key="flag.name" :class="{ 'text-green-lighten-1': flag.active, 'text-red-lighten-1': !flag.active }" class="ma-1">
-                  <v-icon :color="flag.active ? 'green' : 'red'">{{ flag.active ? 'mdi-check-circle' : 'mdi-close-circle' }}</v-icon>
-                  {{ flag.description }}
-                </li>
-              </ul>
+          <v-card class="ma-4" elevation="2">
+            <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">State flags:</v-card-title>
+            <div class="d-flex pa-2">
+              <v-row>
+                <v-col cols="12" v-if="!verboseView">
+                  <div v-for="flag in filteredStateFlags.activeStateFlags" :key="flag.name" :class="{ 'text-green-lighten-1': flag.active, 'text-red-lighten-1': !flag.active }" class="ma-1 pa-1">
+                    <v-icon :color="flag.active ? 'green' : 'red'">{{ flag.active ? 'mdi-check-circle' : 'mdi-close-circle' }}</v-icon>
+                    {{ flag.description }}
+                  </div>
+                </v-col>
+                <template v-else>
+                  <v-col cols="4">
+                    <div v-for="flag in filteredStateFlags.left" :key="flag.name" :class="{ 'text-green-lighten-1': flag.active, 'text-red-lighten-1': !flag.active }" class="ma-1 pa-1">
+                      <v-icon :color="flag.active ? 'green' : 'red'">{{ flag.active ? 'mdi-check-circle' : 'mdi-close-circle' }}</v-icon>
+                      {{ flag.description }}
+                    </div>
+                  </v-col>
+                  <v-col cols="4">
+                    <div v-for="flag in filteredStateFlags.middle" :key="flag.name" :class="{ 'text-green-lighten-1': flag.active, 'text-red-lighten-1': !flag.active }" class="ma-1 pa-1">
+                      <v-icon :color="flag.active ? 'green' : 'red'">{{ flag.active ? 'mdi-check-circle' : 'mdi-close-circle' }}</v-icon>
+                      {{ flag.description }}
+                    </div>
+                  </v-col>
+                  <v-col cols="4">
+                    <div v-for="flag in filteredStateFlags.right" :key="flag.name" :class="{ 'text-green-lighten-1': flag.active, 'text-red-lighten-1': !flag.active }" class="ma-1 pa-1">
+                      <v-icon :color="flag.active ? 'green' : 'red'">{{ flag.active ? 'mdi-check-circle' : 'mdi-close-circle' }}</v-icon>
+                      {{ flag.description }}
+                    </div>
+                  </v-col>
+                </template>
+              </v-row>
             </div>
           </v-card>
         </div>
@@ -367,11 +389,19 @@ const userName = 'Jan Musílek';
 
 const filteredStateFlags = computed(() => {
   if (verboseView.value) {
-    return domainDetail.state_flags.flags
+    return {
+      left: domainDetail.state_flags.flags.filter(flag => !['serverInzoneManual', 'serverOutzoneManual', 'expired', 'notValidated', 'nssetMissing', 'expirationWarning', 'unguarded', 'outzoneUnguarded', 'outzoneUnguardedWarning', 'outzone', 'validationWarning2', 'validationWarning1', 'deleteWarning'].includes(flag.name)),
+      middle: domainDetail.state_flags.flags.filter(flag => ['serverInzoneManual', 'serverOutzoneManual'].includes(flag.name)),
+      right: domainDetail.state_flags.flags.filter(flag => ['expired', 'notValidated', 'nssetMissing', 'expirationWarning', 'unguarded', 'outzoneUnguarded', 'outzoneUnguardedWarning', 'outzone', 'validationWarning2', 'validationWarning1', 'deleteWarning'].includes(flag.name))
+    };
   } else {
-    return domainDetail.state_flags.flags.filter(flag => flag.active);
+    return {
+      activeStateFlags: domainDetail.state_flags.flags.filter(flag => flag.active)
+    };
   }
 });
+
+
 
 const owner = computed(() => {
   const { organization, name, publish, handle } = domainDetail.owner;
