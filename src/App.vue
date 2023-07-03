@@ -48,29 +48,116 @@
             </p>
             <p class="d-flex">
               <span class="ma-1 pa-1 me-auto font-weight-bold">Expires at:</span>
-              <span class="date ma-1 pa-1" color="gray-lighten-3">
-                {{ new Date(domainDetail.expires_at).toLocaleString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                  hour12: true
-                }) }}
+              <span class="date ma-1 pa-1" color="gray-lighten-2">
+                {{ new Date(domainDetail.expires_at).toLocaleString('en-US', options) }}
               </span>
             </p>
           </v-card-text>
         </v-card>
 
         <div>
-          <v-card class="ma-4">
-            <div class="pa-2 bg-grey-lighten-3 font-weight-bold">Events:</div>
-            <div>
-              <div class="pa-2 font-weight-bold">{{ derivedData.events }}</div>
+          <v-card class="ma-4 ">
+            <div class="pa-2 bg-grey-lighten-2 font-weight-bold">Events:</div>
+            <div class="d-flex">
+              <span class="ma-1 pa-1 me-auto font-weight-bold">Create date: </span>
+              <span class="date ma-1 pa-1" color="gray-lighten-2">
+                {{ new Date(domainDetail.events.registered.timestamp).toLocaleString('en-US', options) }}
+              </span>
+              <span class="date ma-1 pa-1 me-auto font-weight-bold" color="gray-lighten-2">
+                Registrar:
+              </span>
+              <a href="#" class="date ma-1 pa-1 " color="info">
+                {{ domainDetail.events.registered.registrar_handle }}
+              </a>
+            </div>
+            <div class="d-flex">
+              <span class="ma-1 pa-1 me-auto font-weight-bold">Update date: </span>
+              <span class="date ma-1 pa-1" color="gray-lighten-2">
+                {{ new Date(domainDetail.events.updated.timestamp).toLocaleString('en-US', options) }}
+              </span>
+              <span class="date ma-1 pa-1 me-auto font-weight-bold" color="gray-lighten-2">
+                Registrar:
+              </span>
+              <span class="date ma-1 pa-1" color="info">
+                {{ domainDetail.events.updated.registrar_handle }}
+              </span>
+            </div>
+            <div class="d-flex">
+              <span class="ma-1 pa-1 me-auto font-weight-bold">Transfer date: </span>
+              <span class="date ma-1 pa-1" color="gray-lighten-2">
+                {{ new Date(domainDetail.events.transferred.timestamp).toLocaleString('en-US', options) }}
+              </span>
+              <span class="date ma-1 pa-1 me-auto font-weight-bold" color="gray-lighten-2">
+                Registrar:
+              </span>
+              <span class="date ma-1 pa-1">
+                {{ domainDetail.events.transferred.registrar_handle }}
+              </span>
+            </div>
+            <div class="d-flex">
+              <span class="ma-1 pa-1 me-auto font-weight-bold">Delete date: </span>
+              <span class="date ma-1 pa-1" color="gray-lighten-2">
+                {{
+
+                }}
+              </span>
             </div>
           </v-card>
         </div>
+
+        <div>
+          <v-card class="ma-4 ">
+            <div class="pa-2 bg-grey-lighten-2 font-weight-bold">State flags:</div>
+            <div class="d-flex">
+              <ul>
+                <li v-for="flag in filteredStateFlags" :key="flag.name" :class="{ 'text-green-lighten-1': flag.active, 'text-red-lighten-1': !flag.active }" class="ma-1">
+                  <v-icon :color="flag.active ? 'green' : 'red'">{{ flag.active ? 'mdi-check-circle' : 'mdi-close-circle' }}</v-icon>
+                  {{ flag.description }}
+                </li>
+              </ul>
+            </div>
+          </v-card>
+        </div>
+
+        <div>
+          <v-card class="ma-4">
+            <div class="pa-2 bg-grey-lighten-2 font-weight-bold">Owner:</div>
+            <div class="d-flex">
+              <div class="pa-2">
+                Handle: {{ owner.handle }}
+              </div>
+              <div class="pa-2">
+                <v-icon v-if="owner.organization" icon="mdi-eye" color="green"></v-icon>
+                Organization: {{ owner.organization }}
+              </div>
+              <div class="pa-2">
+                <v-icon v-if="owner.name" icon="mdi-eye" color="green"></v-icon>
+                Name: {{ owner.name }}
+              </div>
+            </div>
+          </v-card>
+        </div>
+
+        <div v-if="!verboseView">
+          <v-card class="ma-4">
+            <div class="pa-2 bg-grey-lighten-3 font-weight-bold">Administrative Contacts:</div>
+            <template >
+              <div class="d-flex">
+
+                {{ administrativeContacts[0].handle }}: {{ administrativeContacts[0].name }}
+
+              </div>
+              <div class="d-flex">
+
+                {{ administrativeContacts[1].handle }}: {{ administrativeContacts[1].name }}
+              </div>
+            </template>
+          </v-card>
+        </div>
+
+
+
+
 
 
 
@@ -114,59 +201,45 @@ const menuItems = [
   { title: 'LogOut' },
 ];
 
+const options = {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    };
+
+
 const userName = 'Jan Musílek';
 
-const derivedData = computed(() => {
-  const data = {};
-
-
-  data.fqdn = domainDetail.fqdn;
-
-
-  data.dnsServers = domainDetail.nsset.dns.map((dns) => ({
-    name: dns.name,
-    ipAddress: dns.ip_address
-  }));
-
-
-  data.dnsKeys = domainDetail.keyset.dns_keys;
-
-
-  data.owner = {
-    handle: domainDetail.owner.handle,
-    organization: domainDetail.owner.organization,
-    name: domainDetail.owner.name
-  };
-
-
-  data.adminContacts = domainDetail.administrative_contacts.map((contact) => ({
-    handle: contact.handle,
-    organization: contact.organization,
-    name: contact.name
-  }));
-
-
-  data.expiresAt = new Date(domainDetail.expires_at);
-
-
-  data.events = {};
-  for (const eventKey in domainDetail.events) {
-    const event = domainDetail.events[eventKey];
-    if (event) {
-      data.events[eventKey] = {
-        timestamp: new Date(event.timestamp),
-        registrarHandle: event.registrar_handle
-      };
-    }
+const filteredStateFlags = computed(() => {
+  if (verboseView.value) {
+    return domainDetail.state_flags.flags
+  } else {
+    return domainDetail.state_flags.flags.filter(flag => flag.active);
   }
-
-
-  data.stateFlags = domainDetail.state_flags.flags.map((flag) => ({
-    name: flag.name,
-    active: flag.active,
-    description: flag.description
-  }));
-
-  return data;
 });
+
+const owner = computed(() => {
+  const { organization, name, publish, handle } = domainDetail.owner;
+  const isOrganizationVisible = publish.organization;
+  const isNameVisible = publish.name;
+
+  return {
+    handle,
+    organization: isOrganizationVisible ? organization : '',
+    name: isNameVisible ? name : ''
+  };
+});
+
+const administrativeContacts = computed(() => {
+  return domainDetail.administrative_contacts.map(contact => {
+    const { handle, name } = contact;
+    return { handle, name };
+  });
+});
+
+
 </script>
