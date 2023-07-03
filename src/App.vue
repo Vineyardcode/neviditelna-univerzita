@@ -1,5 +1,7 @@
 <template>
   <v-app>
+
+    <!-- NAVBAR -->
     <v-app-bar color="info">
       <v-app-bar-nav-icon variant="text"></v-app-bar-nav-icon>
       <v-toolbar-title>Ferda</v-toolbar-title>
@@ -22,6 +24,7 @@
       </v-btn>
     </v-app-bar>
 
+    <!-- SIDEBAR -->
     <v-navigation-drawer permanent location="left">
       <v-col>
         <v-sheet>
@@ -34,12 +37,14 @@
       </v-col>
     </v-navigation-drawer>
 
+    <!-- MAIN -->
     <v-main class="bg-grey-lighten-3">
       <v-container>
         <v-card-title>{{ domainDetail.fqdn }}</v-card-title>
 
         <v-switch color="info" v-model="verboseView" class="max-width-" label="Verbose view"></v-switch>
 
+        <!-- AUTH INFO -->
         <v-card class="ma-4">
           <v-card-text>
             <p class="d-flex">
@@ -55,6 +60,7 @@
           </v-card-text>
         </v-card>
 
+        <!-- EVENTS -->
         <div>
           <v-card class="ma-4 ">
             <div class="pa-2 bg-grey-lighten-2 font-weight-bold">Events:</div>
@@ -105,6 +111,7 @@
           </v-card>
         </div>
 
+        <!-- STATE FLAGS -->
         <div>
           <v-card class="ma-4 ">
             <div class="pa-2 bg-grey-lighten-2 font-weight-bold">State flags:</div>
@@ -119,6 +126,7 @@
           </v-card>
         </div>
 
+        <!-- OWNER -->
         <div>
           <v-card class="ma-4">
             <div class="pa-2 bg-grey-lighten-2 font-weight-bold">Owner:</div>
@@ -138,20 +146,90 @@
           </v-card>
         </div>
 
+        <!-- ADMINISTRATIVE CONTACTS -->
         <div v-if="!verboseView">
           <v-card class="ma-4">
             <div class="pa-2 bg-grey-lighten-3 font-weight-bold">Administrative Contacts:</div>
-            <template >
-              <div class="d-flex">
+            <div v-for="contact in administrativeContacts" :key="contact.handle" class="d-flex">
+              <span class="ma-1 pa-1">{{ contact.name }}:</span>
+              <span class="ma-1 pa-1">{{ contact.handle }}</span>
+            </div>
+          </v-card>
+        </div>
+        <div v-if="verboseView">
+          <v-card class="ma-4">
+            <div class="pa-2 bg-grey-lighten-3 font-weight-bold">Administrative Contacts:</div>
+            <div v-if="administrativeContacts.length >= 1" class="d-flex">
+              <span class="ma-1 pa-1">Handle: {{ administrativeContacts[0].handle }}</span>
+              <span class="ma-1 pa-1">
+                <v-icon :color="administrativeContacts[0].publish.organization ? 'green' : 'red'">
+                  {{ administrativeContacts[0].publish.organization ? 'mdi-eye' : 'mdi-eye-off' }}
+                </v-icon>
+                Organization: {{ administrativeContacts[0].organization }}
+              </span>
+              <span class="ma-1 pa-1">
+                <v-icon :color="administrativeContacts[0].publish.name ? 'green' : 'red'">
+                  {{ administrativeContacts[0].publish.name ? 'mdi-eye' : 'mdi-eye-off' }}
+                </v-icon>
+                Name: {{ administrativeContacts[0].name }}
+              </span>
+            </div>
+          </v-card>
+          <v-card class="ma-4">
+            <div class="pa-2 bg-grey-lighten-3 font-weight-bold">Administrative Contacts:</div>
+            <div v-if="administrativeContacts.length >= 2" class="d-flex">
+              <span class="ma-1 pa-1">Handle: {{ administrativeContacts[1].handle }}</span>
+              <span class="ma-1 pa-1">
+                <v-icon :color="administrativeContacts[1].publish.organization ? 'green' : 'red'">
+                  {{ administrativeContacts[1].publish.organization ? 'mdi-eye' : 'mdi-eye-off' }}
+                </v-icon>
+                Organization: {{ administrativeContacts[1].organization }}
+              </span>
+              <span class="ma-1 pa-1">
+                <v-icon :color="administrativeContacts[1].publish.name ? 'green' : 'red'">
+                  {{ administrativeContacts[1].publish.name ? 'mdi-eye' : 'mdi-eye-off' }}
+                </v-icon>
+                Name: {{ administrativeContacts[1].name }}
+              </span>
+            </div>
+          </v-card>
+        </div>
 
-                {{ administrativeContacts[0].handle }}: {{ administrativeContacts[0].name }}
-
+        <!-- NSS SET -->
+        <div>
+          <v-card class="ma-4">
+            <div class="pa-2 bg-grey-lighten-2 font-weight-bold">NSSet:</div>
+            <div class="d-flex">
+              <div>
+                <span class="font-weight-bold">Handle:</span> {{ domainDetail.nsset.handle }}
               </div>
-              <div class="d-flex">
-
-                {{ administrativeContacts[1].handle }}: {{ administrativeContacts[1].name }}
+              <div>
+                <span class="font-weight-bold">Registrar:</span> {{ domainDetail.nsset.registrar }}
               </div>
-            </template>
+              <div v-for="dns in domainDetail.nsset.dns" :key="dns.name">
+                <span class="font-weight-bold">DNS:</span>
+
+                <span class="font-weight-bold flew-column">{{ dns.ip_address }}{{ dns.name }}</span>
+              </div>
+            </div>
+          </v-card>
+        </div>
+
+        <!-- KEYSET -->
+        <div>
+          <v-card class="ma-4">
+            <div class="pa-2 bg-grey-lighten-2 font-weight-bold">KeySet:</div>
+            <div class="d-flex">
+              <div>
+                <span class="font-weight-bold">Handle:</span> {{ domainDetail.keyset.handle }}
+              </div>
+              <div>
+                <span class="font-weight-bold">Registrar:</span> {{ domainDetail.keyset.registrar }}
+              </div>
+              <div v-for="key in domainDetail.keyset.dns_keys" :key="key">
+                <span class="font-weight-bold">DNS Key:</span> {{ key }}
+              </div>
+            </div>
           </v-card>
         </div>
 
@@ -159,11 +237,9 @@
 
 
 
-
-
-
       </v-container>
 
+    <!-- PASSWORD WINDOW -->
     <v-fade-transition hide-on-leave>
       <v-card v-if="showPass" append-icon="$close" class="mx-auto" elevation="16" max-width="500" title="Hesla">
         <template v-slot:append>
@@ -234,12 +310,15 @@ const owner = computed(() => {
   };
 });
 
+
 const administrativeContacts = computed(() => {
   return domainDetail.administrative_contacts.map(contact => {
-    const { handle, name } = contact;
-    return { handle, name };
+    const { handle, organization, name, publish } = contact;
+
+    return { handle, organization, name, publish };
   });
 });
+
 
 
 </script>
