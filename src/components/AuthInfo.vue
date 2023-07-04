@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card class="ma-4" elevation="2" >
+    <v-card class="ma-4" elevation="2" min-width="700">
       <v-card-text>
         <v-row>
           <v-col cols="4">

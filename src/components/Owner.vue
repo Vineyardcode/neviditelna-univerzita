@@ -1,15 +1,15 @@
 <template>
   <div>
     <v-card class="ma-4" elevation="2" width="500">
-      <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">Owner:</v-card-title>
+      <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">
+        Owner:
+      </v-card-title>
       <v-card-text class="pa-4">
         <div>
           <v-row>
             <v-col cols="4">
               <div class="font-weight-bold ma-1 pa-1">
-                <v-icon icon="mdi-eye" color="transparent">
-
-                </v-icon>
+                <v-icon icon="mdi-eye" color="transparent"></v-icon>
                 Handle:
               </div>
               <div class="font-weight-bold ma-1 pa-1">
@@ -46,12 +46,30 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+
 export default {
   props: {
-    owner: {
+    domainDetail: {
       type: Object,
       required: true
     }
+  },
+  setup(props) {
+    const owner = computed(() => {
+      const { organization, name, publish, handle } = props.domainDetail.owner;
+
+      return {
+        handle,
+        name,
+        organization,
+        publish
+      };
+    });
+
+    return {
+      owner
+    };
   }
-}
+};
 </script>
