@@ -7,7 +7,9 @@
           <v-row>
             <v-col cols="4">
               <div class="font-weight-bold ma-1 pa-1">
-                <v-icon icon="mdi-eye" color="transparent"></v-icon>
+                <v-icon icon="mdi-eye" color="transparent">
+
+                </v-icon>
                 Handle:
               </div>
               <div class="font-weight-bold ma-1 pa-1">
@@ -24,9 +26,17 @@
               </div>
             </v-col>
             <v-col cols="8">
-              <div class="ma-1 pa-1">{{ owner.handle }}</div>
-              <div class="ma-1 pa-1">{{ owner.organization }}</div>
-              <div class="ma-1 pa-1">{{ owner.name }}</div>
+              <div class="ma-1 pa-1">
+                <a href="#" class="text-decoration-none text-info">
+                  {{ owner.handle }}
+                </a>
+              </div>
+              <div class="ma-1 pa-1">
+                {{ owner.organization }}
+              </div>
+              <div class="ma-1 pa-1">
+                {{ owner.name }}
+              </div>
             </v-col>
           </v-row>
         </div>

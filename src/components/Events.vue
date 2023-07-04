@@ -31,14 +31,20 @@
             <div v-if="domainDetail.events.unregistered" class="font-weight-bold ma-1 pa-1">Registrar:</div>
           </v-col>
           <v-col cols="3">
-            <div class="date ma-1 pa-1" color="info">
-              {{ domainDetail.events.registered.registrar_handle }}
+            <div class="ma-1 pa-1">
+              <a href="#" class="ma-1 pa-1 text-decoration-none text-info">
+                {{ domainDetail.events.registered.registrar_handle }}
+              </a>
             </div>
-            <div class="date ma-1 pa-1" color="info">
-              {{ domainDetail.events.updated.registrar_handle }}
+            <div class="ma-1 pa-1">
+              <a href="#" class="ma-1 pa-1 text-decoration-none text-info">
+                {{ domainDetail.events.updated.registrar_handle }}
+              </a>
             </div>
-            <div class="date ma-1 pa-1" color="info">
-              {{ domainDetail.events.transferred.registrar_handle }}
+            <div class="ma-1 pa-1">
+              <a href="#" class="ma-1 pa-1 text-decoration-none text-info">
+                {{ domainDetail.events.transferred.registrar_handle }}
+              </a>
             </div>
             <div v-if="domainDetail.events.unregistered" class="date ma-1 pa-1" color="info">
               {{ domainDetail.events.unregistered.registrar_handle }}

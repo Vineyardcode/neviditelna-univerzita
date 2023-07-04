@@ -39,7 +39,7 @@
 
     <!-- MAIN -->
     <v-main class="bg-grey-lighten-3 d-flex justify-center" >
-      <v-container class="ma-1 pa-1" >
+      <v-container class="ma-1 pa-1 d-flex flex-column" >
 
           <v-card class="ma-2 bg-transparent elevation-0" width="300">
             <v-card-title>{{ domainDetail.fqdn }}</v-card-title>
@@ -55,7 +55,7 @@
 
 
             <!-- STATE FLAGS -->
-            <StateFlags :verboseView="verboseView" :filteredStateFlags="filteredStateFlags" />
+            <StateFlags :verboseView="verboseView" :domainDetail="domainDetail" />
 
 
             <!-- OWNER -->
@@ -63,7 +63,7 @@
 
 
             <!-- ADMINISTRATIVE CONTACTS -->
-            <AdministrativeContacts :verboseView="verboseView" :administrativeContacts="administrativeContacts" />
+            <AdministrativeContacts :verboseView="verboseView" :domainDetail="domainDetail" />
 
 
             <!-- NSS SET -->
@@ -80,11 +80,13 @@
 </template>
 
 <script setup>
-  import { ref, computed} from 'vue';
+  import { ref, computed } from 'vue';
+
+  // data
   import domainDetail from './data/domain-detail.json';
 
   // components
-  import AuthInfo from '@/components/AuthInfo.vue'
+  import AuthInfo from './components/AuthInfo.vue'
   import Events from '@/components/Events.vue';
   import StateFlags from '@/components/StateFlags.vue';
   import Owner from '@/components/Owner.vue';
@@ -92,67 +94,16 @@
   import NSSet from '@/components/NSSet.vue';
   import KeySet from '@/components/KeySet.vue';
 
-
-
   const verboseView = ref(false);
 
   const menuItems = [
-    { title: 'Click Me' },
-    { title: 'Click Me' },
-    { title: 'Click Me' },
+    { title: 'Menu item' },
+    { title: 'Menu item' },
     { title: 'LogOut' },
   ];
 
   const password = 'Swordfish';
   const userName = 'Jan Musílek';
-
-  const filteredStateFlags = computed(() => {
-    if (verboseView.value) {
-      return {
-        left: domainDetail.state_flags.flags.filter(
-          (flag) =>
-            ![
-              'serverInzoneManual',
-              'serverOutzoneManual',
-              'expired',
-              'notValidated',
-              'nssetMissing',
-              'expirationWarning',
-              'unguarded',
-              'outzoneUnguarded',
-              'outzoneUnguardedWarning',
-              'outzone',
-              'validationWarning2',
-              'validationWarning1',
-              'deleteWarning',
-            ].includes(flag.name)
-        ),
-        middle: domainDetail.state_flags.flags.filter((flag) =>
-          ['serverInzoneManual', 'serverOutzoneManual'].includes(flag.name)
-        ),
-        right: domainDetail.state_flags.flags.filter((flag) =>
-          [
-            'expired',
-            'notValidated',
-            'nssetMissing',
-            'expirationWarning',
-            'unguarded',
-            'outzoneUnguarded',
-            'outzoneUnguardedWarning',
-            'outzone',
-            'validationWarning2',
-            'validationWarning1',
-            'deleteWarning',
-          ].includes(flag.name)
-        ),
-      };
-    } else {
-      return {
-        activeStateFlags: domainDetail.state_flags.flags.filter((flag) => flag.active),
-      };
-    }
-  });
-
 
   const owner = computed(() => {
     const { organization, name, publish, handle } = domainDetail.owner;
@@ -164,15 +115,5 @@
       publish
     };
   });
-
-
-  const administrativeContacts = computed(() => {
-    return domainDetail.administrative_contacts.map(contact => {
-      const { handle, organization, name, publish } = contact;
-
-      return { handle, organization, name, publish };
-    });
-  });
-
 
 </script>

@@ -43,10 +43,59 @@ export default {
       type: Boolean,
       required: true
     },
-    filteredStateFlags: {
+    domainDetail: {
       type: Object,
       required: true
     }
+  },
+  computed: {
+    filteredStateFlags() {
+      if (this.verboseView) {
+        return {
+          left: this.domainDetail.state_flags.flags.filter(
+            (flag) =>
+              ![
+                'serverInzoneManual',
+                'serverOutzoneManual',
+                'expired',
+                'notValidated',
+                'nssetMissing',
+                'expirationWarning',
+                'unguarded',
+                'outzoneUnguarded',
+                'outzoneUnguardedWarning',
+                'outzone',
+                'validationWarning2',
+                'validationWarning1',
+                'deleteWarning',
+              ].includes(flag.name)
+          ),
+          middle: this.domainDetail.state_flags.flags.filter((flag) =>
+            ['serverInzoneManual', 'serverOutzoneManual'].includes(flag.name)
+          ),
+          right: this.domainDetail.state_flags.flags.filter((flag) =>
+            [
+              'expired',
+              'notValidated',
+              'nssetMissing',
+              'expirationWarning',
+              'unguarded',
+              'outzoneUnguarded',
+              'outzoneUnguardedWarning',
+              'outzone',
+              'validationWarning2',
+              'validationWarning1',
+              'deleteWarning',
+            ].includes(flag.name)
+          ),
+        };
+      } else {
+        return {
+          activeStateFlags: this.domainDetail.state_flags.flags.filter((flag) => flag.active),
+        };
+      }
+    }
   }
-}
+};
 </script>
+

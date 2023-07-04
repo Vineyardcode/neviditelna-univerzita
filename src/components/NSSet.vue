@@ -10,12 +10,20 @@
             <div class="font-weight-bold ma-1 pa-1 pt-2">DNS:</div>
           </v-col>
           <v-col cols="8">
-            <div class="ma-1 pa-1">{{ domainDetail.nsset.handle }}</div>
-            <div class="ma-1 pa-1">{{ domainDetail.nsset.registrar }}</div>
+            <div class="ma-1 pa-1">
+              <a href="#" class="text-decoration-none text-info">
+                {{ domainDetail.nsset.handle }}
+              </a>
+            </div>
+            <div class="ma-1 pa-1">
+              <a href="#" class="text-decoration-none text-info">
+                {{ domainDetail.nsset.registrar }}
+              </a>
+            </div>
             <div v-for="dns in domainDetail.nsset.dns" :key="dns.name">
               <div class="d-flex">
-                <div class="font-weight-bold pl-2">{{ dns.ip_address }}</div>
-                <div class="font-weight-bold pl-2">{{ dns.name }}</div>
+                <div class="pl-2">{{ dns.ip_address }}</div>
+                <div class="pl-2">{{ dns.name }}</div>
               </div>
             </div>
           </v-col>
