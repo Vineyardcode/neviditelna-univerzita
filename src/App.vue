@@ -38,374 +38,141 @@
     </v-navigation-drawer>
 
     <!-- MAIN -->
-    <v-main class="bg-grey-lighten-3" >
-      <v-container class="ma-1 pa-1">
-        <v-row >
-          <v-col cols="12" md="6">
+    <v-main class="bg-grey-lighten-3 d-flex justify-center" >
+      <v-container class="ma-1 pa-1" >
 
-
-          <v-card-title>{{ domainDetail.fqdn }}</v-card-title>
-          <v-switch color="info" v-model="verboseView" label="Verbose view"></v-switch>
+          <v-card class="ma-2 bg-transparent elevation-0" width="300">
+            <v-card-title>{{ domainDetail.fqdn }}</v-card-title>
+            <v-switch color="info" v-model="verboseView" label="Verbose view" class="pl-3"></v-switch>
+          </v-card>
 
             <!-- AUTH INFO -->
-            <div>
-              <v-card class="ma-4" elevation="2" min-width="500">
-                <v-card-text>
-                  <v-row>
-                    <v-col cols="4">
-                      <div class="ma-2 pa-2 font-weight-bold">AuthInfo:</div>
-                      <div class="ma-2 pa-2 font-weight-bold">Expires at:</div>
-                    </v-col>
-                    <v-col cols="8">
-                      <div class="d-flex align-center">
-                        <span class="ma-1 pa-1 me-auto">
-                          <v-btn color="info" @click="showPass = !showPass">
-                            {{ showPass ? "secret password: " + password : 'SHOW' }}
-                          </v-btn>
-                        </span>
-                      </div>
-                      <div class="d-flex">
-                        <span class="ma-1 pa-1 me-auto">
-                          {{ new Date(domainDetail.expires_at).toLocaleString('en-US', options) }}
-                        </span>
-                      </div>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </div>
+            <AuthInfo :domainDetail="domainDetail" :password="password"/>
+
 
             <!-- EVENTS -->
-            <div>
-              <v-card class="ma-4" elevation="2" min-width="500">
-                <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">Events:</v-card-title>
-                <v-card-text class="pa-4">
-                  <v-row>
-                    <v-col cols="2">
-                      <div class="font-weight-bold ma-1 pa-1">Create date:</div>
-                      <div class="font-weight-bold ma-1 pa-1">Update date:</div>
-                      <div class="font-weight-bold ma-1 pa-1">Transfer date:</div>
-                      <div class="font-weight-bold ma-1 pa-1">Delete date:</div>
-                    </v-col>
-                    <v-col cols="4">
-                      <div class="date ma-1 pa-1" color="gray-lighten-2">
-                        {{ new Date(domainDetail.events.registered.timestamp).toLocaleString('en-US', options) }}
-                      </div>
-                      <div class="date ma-1 pa-1" color="gray-lighten-2">
-                        {{ new Date(domainDetail.events.updated.timestamp).toLocaleString('en-US', options) }}
-                      </div>
-                      <div class="date ma-1 pa-1" color="gray-lighten-2">
-                        {{ new Date(domainDetail.events.transferred.timestamp).toLocaleString('en-US', options) }}
-                      </div>
-                      <div v-if="domainDetail.events.unregistered" class="date ma-1 pa-1" color="gray-lighten-2">
-                        {{ domainDetail.events.transferred.timestamp }}
-                      </div>
-                    </v-col>
-                    <v-col cols="3">
-                      <div class="font-weight-bold ma-1 pa-1">Registrar:</div>
-                      <div class="font-weight-bold ma-1 pa-1">Registrar:</div>
-                      <div class="font-weight-bold ma-1 pa-1">Registrar:</div>
-                      <div v-if="domainDetail.events.unregistered" class="font-weight-bold ma-1 pa-1">Registrar:</div>
-                    </v-col>
-                    <v-col cols="3">
-                      <div class="date ma-1 pa-1" color="info">
-                        {{ domainDetail.events.registered.registrar_handle }}
-                      </div>
-                      <div class="date ma-1 pa-1" color="info">
-                        {{ domainDetail.events.updated.registrar_handle }}
-                      </div>
-                      <div class="date ma-1 pa-1" color="info">
-                        {{ domainDetail.events.transferred.registrar_handle }}
-                      </div>
-                      <div v-if="domainDetail.events.unregistered" class="date ma-1 pa-1" color="info">
-                        {{ domainDetail.events.unregistered.registrar_handle }}
-                      </div>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </div>
+            <Events :domainDetail="domainDetail" />
+
 
             <!-- STATE FLAGS -->
-            <div>
-              <v-card class="ma-4" elevation="2" min-width="500">
-                <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">State flags:</v-card-title>
-                <div class="d-flex pa-2">
-                  <v-row>
-                    <v-col cols="12" v-if="!verboseView">
-                      <div v-for="flag in filteredStateFlags.activeStateFlags" :key="flag.name" :class="{ 'text-green-lighten-1': flag.active, 'text-red-lighten-1': !flag.active }" class="ma-1 pa-1">
-                        <v-icon :color="flag.active ? 'green' : 'red'">{{ flag.active ? 'mdi-check-circle' : 'mdi-close-circle' }}</v-icon>
-                        {{ flag.description }}
-                      </div>
-                    </v-col>
-                    <template v-else>
-                      <v-col cols="4">
-                        <div v-for="flag in filteredStateFlags.left" :key="flag.name" :class="{ 'text-green-lighten-1': flag.active, 'text-red-lighten-1': !flag.active }" class="ma-1 pa-1">
-                          <v-icon :color="flag.active ? 'green' : 'red'">{{ flag.active ? 'mdi-check-circle' : 'mdi-close-circle' }}</v-icon>
-                          {{ flag.description }}
-                        </div>
-                      </v-col>
-                      <v-col cols="4">
-                        <div v-for="flag in filteredStateFlags.middle" :key="flag.name" :class="{ 'text-green-lighten-1': flag.active, 'text-red-lighten-1': !flag.active }" class="ma-1 pa-1">
-                          <v-icon :color="flag.active ? 'green' : 'red'">{{ flag.active ? 'mdi-check-circle' : 'mdi-close-circle' }}</v-icon>
-                          {{ flag.description }}
-                        </div>
-                      </v-col>
-                      <v-col cols="4">
-                        <div v-for="flag in filteredStateFlags.right" :key="flag.name" :class="{ 'text-green-lighten-1': flag.active, 'text-red-lighten-1': !flag.active }" class="ma-1 pa-1">
-                          <v-icon :color="flag.active ? 'green' : 'red'">{{ flag.active ? 'mdi-check-circle' : 'mdi-close-circle' }}</v-icon>
-                          {{ flag.description }}
-                        </div>
-                      </v-col>
-                    </template>
-                  </v-row>
-                </div>
-              </v-card>
-            </div>
-          </v-col>
-          <v-col cols="8" md="6">
+            <StateFlags :verboseView="verboseView" :filteredStateFlags="filteredStateFlags" />
+
+
             <!-- OWNER -->
-            <div>
-              <v-card class="ma-4" elevation="2" min-width="500">
-                <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">Owner:</v-card-title>
-                <v-card-text class="pa-4">
-                  <div>
-                    <v-row>
-                      <v-col cols="4">
-                        <div class="font-weight-bold ma-1 pa-1">
-                          <v-icon icon="mdi-eye" color="transparent">
-                          </v-icon>
-                          Handle:
-                        </div>
-                        <div class="font-weight-bold ma-1 pa-1">
-                          <v-icon :color="owner.publish.organization ? 'green' : 'red'">
-                            {{ owner.publish.organization ? 'mdi-eye' : 'mdi-eye-off' }}
-                          </v-icon>
-                          Organization:
-                        </div>
-                        <div class="font-weight-bold ma-1 pa-1">
-                          <v-icon :color="owner.publish.name ? 'green' : 'red'">
-                            {{ owner.publish.name ? 'mdi-eye' : 'mdi-eye-off' }}
-                          </v-icon>
-                          Name:
-                        </div>
-                      </v-col>
-                      <v-col cols="8">
-                        <div class="ma-1 pa-1">{{ owner.handle }}</div>
-                        <div class="ma-1 pa-1">{{ owner.organization }}</div>
-                        <div class="ma-1 pa-1">{{ owner.name }}</div>
-                      </v-col>
-                    </v-row>
-                  </div>
-                </v-card-text>
-              </v-card>
-            </div>
+            <Owner :owner="owner" />
+
 
             <!-- ADMINISTRATIVE CONTACTS -->
-            <div >
-              <v-card v-if="!verboseView" class="ma-4" elevation="2" min-width="500"  >
-                <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">Administrative Contacts:</v-card-title>
-                <v-card-text class="pa-4">
-                  <div v-for="contact in administrativeContacts" :key="contact.handle" class="d-flex">
-                    <v-row>
-                      <v-col cols="4">
-                        <div class="font-weight-bold ma-1 pa-1">{{ contact.name }}:</div>
-                      </v-col>
-                      <v-col cols="6">
-                        <div class="ma-1 pa-1">{{ contact.handle }}</div>
-                      </v-col>
-                    </v-row>
-                  </div>
-                </v-card-text>
-              </v-card>
-            </div>
-            <div v-if="verboseView">
-              <v-card class="ma-4" elevation="2" min-width="500" >
-                <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">Administrative Contact:</v-card-title>
-                <v-card-text class="pa-4">
-                  <div>
-                    <v-row>
-                      <v-col cols="4">
-                        <div class="font-weight-bold ma-1 pa-1">
-                          <v-icon icon="mdi-eye" color="transparent">
-                          </v-icon>
-                          Handle:
-                        </div>
-                        <div class="font-weight-bold ma-1 pa-1">
-                          <v-icon :color="administrativeContacts[0].publish.organization ? 'green' : 'red'">
-                            {{ administrativeContacts[0].publish.organization ? 'mdi-eye' : 'mdi-eye-off' }}
-                          </v-icon>
-                          Organization:
-                        </div>
-                        <div class="font-weight-bold ma-1 pa-1">
-                          <v-icon :color="administrativeContacts[0].publish.name ? 'green' : 'red'">
-                            {{ administrativeContacts[0].publish.name ? 'mdi-eye' : 'mdi-eye-off' }}
-                          </v-icon>
-                          Name:
-                        </div>
-                      </v-col>
-                      <v-col cols="8">
-                        <div class="ma-1 pa-1">{{ administrativeContacts[0].handle }}</div>
-                        <div class="ma-1 pa-1">{{ administrativeContacts[0].organization }}</div>
-                        <div class="ma-1 pa-1">{{ administrativeContacts[0].name }}</div>
-                      </v-col>
-                    </v-row>
-                  </div>
-                </v-card-text>
-              </v-card>
-              <v-card class="ma-4" elevation="2" min-width="500" >
-                <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">Administrative Contact:</v-card-title>
-                <v-card-text class="pa-4">
-                  <div>
-                    <v-row>
-                      <v-col cols="4">
-                        <div class="font-weight-bold ma-1 pa-1">
-                          <v-icon icon="mdi-eye" color="transparent">
-                          </v-icon>
-                          Handle:
-                        </div>
-                        <div class="font-weight-bold ma-1 pa-1">
-                          <v-icon :color="administrativeContacts[1].publish.organization ? 'green' : 'red'">
-                            {{ administrativeContacts[1].publish.organization ? 'mdi-eye' : 'mdi-eye-off' }}
-                          </v-icon>
-                          Organization:
-                        </div>
-                        <div class="font-weight-bold ma-1 pa-1">
-                          <v-icon :color="administrativeContacts[1].publish.name ? 'green' : 'red'">
-                            {{ administrativeContacts[1].publish.name ? 'mdi-eye' : 'mdi-eye-off' }}
-                          </v-icon>
-                          Name:
-                        </div>
-                      </v-col>
-                      <v-col cols="8">
-                        <div class="ma-1 pa-1">{{ administrativeContacts[1].handle }}</div>
-                        <div class="ma-1 pa-1">{{ administrativeContacts[1].organization }}</div>
-                        <div class="ma-1 pa-1">{{ administrativeContacts[1].name }}</div>
-                      </v-col>
-                    </v-row>
-                  </div>
-                </v-card-text>
-              </v-card>
-            </div>
+            <AdministrativeContacts :verboseView="verboseView" :administrativeContacts="administrativeContacts" />
+
 
             <!-- NSS SET -->
-            <div>
-              <v-card class="ma-4" elevation="2" min-width="500" >
-                <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">NSSet:</v-card-title>
-                <v-card-text class="pa-4">
-                  <v-row>
-                    <v-col cols="4">
-                      <div class="font-weight-bold ma-1 pa-1">Handle:</div>
-                      <div class="font-weight-bold ma-1 pa-1">Registrar:</div>
-                      <div class="font-weight-bold ma-1 pa-1 pt-2">DNS:</div>
-                    </v-col>
-                    <v-col cols="8">
-                      <div class="ma-1 pa-1">{{ domainDetail.nsset.handle }}</div>
-                      <div class="ma-1 pa-1">{{ domainDetail.nsset.registrar }}</div>
-                      <div v-for="dns in domainDetail.nsset.dns" :key="dns.name">
-                        <div class="d-flex">
-                          <div class="font-weight-bold pl-2">{{ dns.ip_address }}</div>
-                          <div class="font-weight-bold pl-2">{{ dns.name }}</div>
-                        </div>
-                      </div>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </div>
+            <NSSet :domainDetail="domainDetail" />
+
 
             <!-- KEYSET -->
-            <div>
-              <v-card class="ma-4" elevation="2" min-width="500" >
-                <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3 font">KeySet:</v-card-title>
-                <v-card-text class="pa-4">
-                  <v-row>
-                    <v-col cols="4">
-                      <div class="font-weight-bold ma-1 pa-1">Handle:</div>
-                      <div class="font-weight-bold ma-1 pa-1">Registrar:</div>
-                      <div class="font-weight-bold ma-1 pa-1 pt-2">DNS Keys:</div>
-                    </v-col>
-                    <v-col cols="8">
-                      <div class="ma-1 pa-1">{{ domainDetail.keyset.handle }}</div>
-                      <div class="ma-1 pa-1">{{ domainDetail.keyset.registrar }}</div>
-                      <div class="ma-1 pa-1" v-for="key in domainDetail.keyset.dns_keys" :key="key">{{ key }}</div>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </div>
-          </v-col>
-        </v-row>
+            <KeySet :domainDetail="domainDetail" />
+
+
       </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script setup>
-import { ref, computed} from 'vue';
-import domainDetail from './data/domain-detail.json';
+  import { ref, computed} from 'vue';
+  import domainDetail from './data/domain-detail.json';
 
-const showPass = ref(false);
-
-const verboseView = ref(false);
-
-const menuItems = [
-  { title: 'Click Me' },
-  { title: 'Click Me' },
-  { title: 'Click Me' },
-  { title: 'LogOut' },
-];
-
-const options = {
-      year: 'numeric',
-      month: 'short',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    };
-
-const password = 'Swordfish';
-const userName = 'Jan Musílek';
-
-const filteredStateFlags = computed(() => {
-  if (verboseView.value) {
-    return {
-      left: domainDetail.state_flags.flags.filter(flag => !['serverInzoneManual', 'serverOutzoneManual', 'expired', 'notValidated', 'nssetMissing', 'expirationWarning', 'unguarded', 'outzoneUnguarded', 'outzoneUnguardedWarning', 'outzone', 'validationWarning2', 'validationWarning1', 'deleteWarning'].includes(flag.name)),
-      middle: domainDetail.state_flags.flags.filter(flag => ['serverInzoneManual', 'serverOutzoneManual'].includes(flag.name)),
-      right: domainDetail.state_flags.flags.filter(flag => ['expired', 'notValidated', 'nssetMissing', 'expirationWarning', 'unguarded', 'outzoneUnguarded', 'outzoneUnguardedWarning', 'outzone', 'validationWarning2', 'validationWarning1', 'deleteWarning'].includes(flag.name))
-    };
-  } else {
-    return {
-      activeStateFlags: domainDetail.state_flags.flags.filter(flag => flag.active)
-    };
-  }
-});
+  // components
+  import AuthInfo from '@/components/AuthInfo.vue'
+  import Events from '@/components/Events.vue';
+  import StateFlags from '@/components/StateFlags.vue';
+  import Owner from '@/components/Owner.vue';
+  import AdministrativeContacts from '@/components/AdministrativeContacts.vue';
+  import NSSet from '@/components/NSSet.vue';
+  import KeySet from '@/components/KeySet.vue';
 
 
 
-const owner = computed(() => {
-  const { organization, name, publish, handle } = domainDetail.owner;
+  const verboseView = ref(false);
 
+  const menuItems = [
+    { title: 'Click Me' },
+    { title: 'Click Me' },
+    { title: 'Click Me' },
+    { title: 'LogOut' },
+  ];
 
-  return {
-    handle,
-    name,
-    organization,
-    publish
-  };
-});
+  const password = 'Swordfish';
+  const userName = 'Jan Musílek';
 
-
-const administrativeContacts = computed(() => {
-  return domainDetail.administrative_contacts.map(contact => {
-    const { handle, organization, name, publish } = contact;
-
-    return { handle, organization, name, publish };
+  const filteredStateFlags = computed(() => {
+    if (verboseView.value) {
+      return {
+        left: domainDetail.state_flags.flags.filter(
+          (flag) =>
+            ![
+              'serverInzoneManual',
+              'serverOutzoneManual',
+              'expired',
+              'notValidated',
+              'nssetMissing',
+              'expirationWarning',
+              'unguarded',
+              'outzoneUnguarded',
+              'outzoneUnguardedWarning',
+              'outzone',
+              'validationWarning2',
+              'validationWarning1',
+              'deleteWarning',
+            ].includes(flag.name)
+        ),
+        middle: domainDetail.state_flags.flags.filter((flag) =>
+          ['serverInzoneManual', 'serverOutzoneManual'].includes(flag.name)
+        ),
+        right: domainDetail.state_flags.flags.filter((flag) =>
+          [
+            'expired',
+            'notValidated',
+            'nssetMissing',
+            'expirationWarning',
+            'unguarded',
+            'outzoneUnguarded',
+            'outzoneUnguardedWarning',
+            'outzone',
+            'validationWarning2',
+            'validationWarning1',
+            'deleteWarning',
+          ].includes(flag.name)
+        ),
+      };
+    } else {
+      return {
+        activeStateFlags: domainDetail.state_flags.flags.filter((flag) => flag.active),
+      };
+    }
   });
-});
 
+
+  const owner = computed(() => {
+    const { organization, name, publish, handle } = domainDetail.owner;
+
+    return {
+      handle,
+      name,
+      organization,
+      publish
+    };
+  });
+
+
+  const administrativeContacts = computed(() => {
+    return domainDetail.administrative_contacts.map(contact => {
+      const { handle, organization, name, publish } = contact;
+
+      return { handle, organization, name, publish };
+    });
+  });
 
 
 </script>
