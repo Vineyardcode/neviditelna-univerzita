@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-card v-if="!verboseView" class="ma-4" elevation="2" width="500">
+    <v-card v-if="!verboseView" class="ma-4" elevation="2">
       <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">Administrative Contacts:</v-card-title>
       <v-card-text class="pa-4">
         <div v-for="contact in administrativeContacts" :key="contact.handle" class="d-flex">

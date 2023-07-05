@@ -16,12 +16,14 @@
 
       <v-container class="ma-1 pa-4" >
 
+
           <v-card class="ma-1 bg-transparent elevation-0">
             <v-card-title>{{ domainDetail.fqdn }}</v-card-title>
             <div width="200">
             <v-switch color="info" v-model="verboseView" label="Verbose view" class="pl-3 d-inline-block"></v-switch>
             </div>
           </v-card>
+
 
         <v-row>
           <v-col>
@@ -65,7 +67,7 @@
 </template>
 
 <script setup>
-  import { ref, computed } from 'vue';
+  import { ref } from 'vue';
 
   // data
   import domainDetail from './data/domain-detail.json';
