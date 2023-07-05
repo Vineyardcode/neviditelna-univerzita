@@ -23,7 +23,7 @@
     </v-card>
 
     <div v-if="verboseView">
-    <v-card v-for="(contact, index) in administrativeContacts" :key="index" class="ma-4" elevation="2" width="500">
+    <v-card v-for="(contact, index) in administrativeContacts" :key="index" class="ma-4" elevation="2">
       <v-card-title class="pa-2 font-weight-bold bg-grey-lighten-3">Administrative Contact:</v-card-title>
       <v-card-text class="pa-4">
         <div >
