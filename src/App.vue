@@ -9,7 +9,7 @@
     <!-- MAIN -->
     <v-main class="bg-grey-lighten-3 d-flex justify-center">
       <v-container class="ma-1 pa-4">
-        <v-card class="ma-1 bg-transparent elevation-0">
+        <v-card class="mt-4 ml-4 bg-transparent elevation-0">
           <v-card-title>{{ domainDetail ? domainDetail.fqdn : 'Loading...' }}</v-card-title>
           <div width="200">
             <v-switch color="info" v-model="verboseView" label="Verbose view" class="pl-3 d-inline-block"></v-switch>
