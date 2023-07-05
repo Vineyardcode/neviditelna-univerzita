@@ -18,7 +18,6 @@
           <v-list-item v-for="(item, index) in menuItems" :key="index" :value="index">
             <v-list-item-title>
               {{ item.title }}
-              <!-- Render the icon next to the last item -->
               <v-icon v-if="index === menuItems.length - 1" class="pl-3">mdi-logout</v-icon>
             </v-list-item-title>
           </v-list-item>
